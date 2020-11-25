@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ErrorBoundary from 'src/components/ErrorBoundary';
-import { fetchRectangles } from 'src/providers/reducers/rectangles.slice';
+import { fetchRectangles, updateRectanglePosition } from 'src/providers/reducers/rectangles.slice';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { increment } from 'src/providers/reducers/filters.reducer';
@@ -32,30 +32,31 @@ type Props = {
 
 gsap.registerPlugin(Draggable);
 
-const renderRectangles = (ref: HTMLDivElement): void => {
-  const draggables = Draggable.create('.box', {
-    bounds: ref,
-    type: 'x,y',
-  });
-  const area = draggables[0];
-
-  area.applyBounds(ref);
-};
-
 const Home: React.FC<Props> = () => {
   const dispatch = useDispatch();
   const rectangles = useSelector((state: RootState) => state.rectangles);
   const refContainer = useRef(null);
 
-  useEffect(() => {
-    dispatch(fetchRectangles(123));
-  }, []);
+  const updatePosition = (e: PointerEvent): void => {
+    const target = e.target as HTMLDivElement;
+    const id = target.getAttribute('id');
+    const x = parseInt(target.getAttribute('x'));
+    const y = parseInt(target.getAttribute('y'));
 
-  const handleDrag = (): void => {
-    dispatch(fetchRectangles(123))
-      .then(unwrapResult)
-      .then(res => console.log(res));
+    dispatch(updateRectanglePosition({ id, x, y }));
   };
+
+  const renderRectangles = (ref: HTMLDivElement): void => {
+    const [area] = Draggable.create('.box', {
+      bounds: ref,
+      type: 'x,y',
+      onDragEnd: updatePosition,
+    });
+
+    area.applyBounds(ref);
+  };
+
+  useEffect(() => void dispatch(fetchRectangles()), []);
 
   useEffect(() => {
     if (rectangles.length) renderRectangles(refContainer.current);
@@ -66,7 +67,7 @@ const Home: React.FC<Props> = () => {
       <Content>
         <Area ref={refContainer}>
           {rectangles.map(item => (
-            <Rectangle key={item.id} options={item} onDrag={handleDrag} />
+            <Rectangle key={item.id} options={item} />
           ))}
         </Area>
         <List items={rectangles} />

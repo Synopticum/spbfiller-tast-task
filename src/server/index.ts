@@ -23,6 +23,13 @@ app.use('/api/rectangles', async (req, res) => {
   res.end(JSON.stringify(db));
 });
 
+app.put('/api/rectangle', async (req, res) => {
+  await simulateWaiting();
+
+  res.set('Content-Type', 'application/json');
+  res.end();
+});
+
 app.listen(3000, () => {
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
   console.log(`API_URL: ${process.env.API_URL}`);

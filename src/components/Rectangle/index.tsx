@@ -14,7 +14,6 @@ const StyledRectangle = styled.div<Options>`
 
 type Props = {
   options: Options;
-  onDrag: () => void;
 };
 
 const Rectangle: React.FC<Props> = ({ options }) => {

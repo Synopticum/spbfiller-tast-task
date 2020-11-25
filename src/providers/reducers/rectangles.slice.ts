@@ -11,14 +11,31 @@ export type Rectangle = {
 
 type State = Rectangle[];
 
-export const fetchRectangles = createAsyncThunk('fetchRectangles', async (id: number, { rejectWithValue }) => {
+export const fetchRectangles = createAsyncThunk('fetchRectangles', async (args: null, { rejectWithValue }) => {
   try {
-    const employees: Rectangle[] = await fetch('/api/rectangles').then(res => res.json());
-    return employees;
+    const rectangles: Rectangle[] = await fetch('/api/rectangles').then(res => res.json());
+    return rectangles;
   } catch (e) {
     rejectWithValue(e);
   }
 });
+
+export const updateRectanglePosition = createAsyncThunk(
+  'updateRectanglePosition',
+  async (options: Pick<Rectangle, 'id' | 'x' | 'y'>, { rejectWithValue }) => {
+    try {
+      const initOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(options),
+      };
+      const rectangles: Rectangle[] = await fetch('/api/rectangle', initOptions).then(res => res.json());
+      return rectangles;
+    } catch (e) {
+      rejectWithValue(e);
+    }
+  },
+);
 
 const initialState: State = [];
 
@@ -33,7 +50,6 @@ const rectanglesSlice = createSlice({
 
     builder.addCase(fetchRectangles.fulfilled, (state, action) => {
       const payload: Rectangle[] = action.payload ? action.payload : initialState;
-
       return payload;
     });
 

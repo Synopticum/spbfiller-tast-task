@@ -68,7 +68,7 @@ const config = merge([
         index: '/web/',
       },
       before: (app): void => {
-        app.use(['/api/rectangles/'], proxy(process.env.API_URL));
+        app.use(['/api/rectangles/', '/api/rectangle/'], proxy(process.env.API_URL));
       },
     },
   },
