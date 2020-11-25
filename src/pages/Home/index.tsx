@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import ErrorBoundary from 'src/components/ErrorBoundary';
-import { fetchRectangles, updateRectanglePosition } from 'src/providers/reducers/rectangles.slice';
+import {
+  fetchRectangles,
+  updateRectanglePositionOnServer,
+  updateRectanglePositionInStore,
+} from 'src/providers/reducers/rectangles.slice';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { increment } from 'src/providers/reducers/filters.reducer';
@@ -39,22 +43,24 @@ const Home: React.FC<Props> = () => {
 
   const updatePositionInStore = (e: PointerEvent): void => {
     const target = e.target as HTMLDivElement;
+    const { x: parentX, y: parentY } = target.parentElement.getBoundingClientRect();
+    const { x: targetX, y: targetY } = target.getBoundingClientRect();
     const id = target.getAttribute('id');
-    const x = target.offsetLeft;
-    const y = target.offsetTop;
+    const x = Math.round(targetX) - Math.round(parentX);
+    const y = Math.round(targetY) - Math.round(parentY);
 
-    console.log(x, y);
+    dispatch(updateRectanglePositionInStore({ id, x, y }));
   };
 
   const throttledUpdatePositionInStore = throttle(updatePositionInStore, 100);
 
-  const updatePosition = (e: PointerEvent): void => {
+  const updatePositionOnServer = (e: PointerEvent): void => {
     const target = e.target as HTMLDivElement;
     const id = target.getAttribute('id');
     const x = parseInt(target.getAttribute('x'));
     const y = parseInt(target.getAttribute('y'));
 
-    dispatch(updateRectanglePosition({ id, x, y }));
+    dispatch(updateRectanglePositionOnServer({ id, x, y }));
   };
 
   const renderRectangles = (ref: HTMLDivElement): void => {
@@ -62,7 +68,7 @@ const Home: React.FC<Props> = () => {
       bounds: ref,
       type: 'x,y',
       onDrag: (e: PointerEvent): void => throttledUpdatePositionInStore(e),
-      onDragEnd: updatePosition,
+      onDragEnd: updatePositionOnServer,
     });
 
     area.applyBounds(ref);

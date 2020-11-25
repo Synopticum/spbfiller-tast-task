@@ -20,8 +20,8 @@ export const fetchRectangles = createAsyncThunk('fetchRectangles', async (args: 
   }
 });
 
-export const updateRectanglePosition = createAsyncThunk(
-  'updateRectanglePosition',
+export const updateRectanglePositionOnServer = createAsyncThunk(
+  'updateRectanglePositionOnServer',
   async (options: Pick<Rectangle, 'id' | 'x' | 'y'>, { rejectWithValue }) => {
     try {
       const initOptions = {
@@ -42,7 +42,12 @@ const initialState: State = [];
 const rectanglesSlice = createSlice({
   name: 'posts',
   initialState: initialState,
-  reducers: {},
+  reducers: {
+    updateRectanglePositionInStore: (state, action): void => {
+      const { id, x, y } = action.payload;
+      console.log(x, y);
+    },
+  },
   extraReducers: builder => {
     builder.addCase(fetchRectangles.pending, (state, action) => {
       // nothing
@@ -59,4 +64,5 @@ const rectanglesSlice = createSlice({
   },
 });
 
+export const { updateRectanglePositionInStore } = rectanglesSlice.actions;
 export default rectanglesSlice.reducer;
