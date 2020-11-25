@@ -36,7 +36,7 @@ app.put('/api/rectangle', async (req, res) => {
 
 app.listen(3000, () => {
   console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
-  console.log(`API_URL: ${process.env.API_URL}`);
+  // console.log(`API_URL: ${process.env.API_URL}`);
 });
 
 export default app;
