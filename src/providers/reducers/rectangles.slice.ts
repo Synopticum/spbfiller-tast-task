@@ -11,17 +11,14 @@ export type Rectangle = {
 
 type State = Rectangle[];
 
-export const asyncFetchRectangles = createAsyncThunk(
-  'asyncFetchRectangles',
-  async (id: number, { rejectWithValue }) => {
-    try {
-      const employees: Rectangle[] = await fetch('/api/rectangles').then(res => res.json());
-      return employees;
-    } catch (e) {
-      rejectWithValue(e);
-    }
-  },
-);
+export const fetchRectangles = createAsyncThunk('fetchRectangles', async (id: number, { rejectWithValue }) => {
+  try {
+    const employees: Rectangle[] = await fetch('/api/rectangles').then(res => res.json());
+    return employees;
+  } catch (e) {
+    rejectWithValue(e);
+  }
+});
 
 const initialState: State = [];
 
@@ -30,17 +27,17 @@ const rectanglesSlice = createSlice({
   initialState: initialState,
   reducers: {},
   extraReducers: builder => {
-    builder.addCase(asyncFetchRectangles.pending, (state, action) => {
+    builder.addCase(fetchRectangles.pending, (state, action) => {
       // nothing
     });
 
-    builder.addCase(asyncFetchRectangles.fulfilled, (state, action) => {
+    builder.addCase(fetchRectangles.fulfilled, (state, action) => {
       const payload: Rectangle[] = action.payload ? action.payload : initialState;
 
       return payload;
     });
 
-    builder.addCase(asyncFetchRectangles.rejected, (state, action) => {
+    builder.addCase(fetchRectangles.rejected, (state, action) => {
       // nothing
     });
   },

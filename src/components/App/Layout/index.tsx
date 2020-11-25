@@ -13,8 +13,6 @@ const ChunkedPage = loadable(() => import(/* webpackPrefetch: true */ '../../../
 const Content = styled.div`
   flex: 1 0 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 type Props = {};

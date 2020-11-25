@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ErrorBoundary from 'src/components/ErrorBoundary';
-import { asyncFetchRectangles } from 'src/providers/reducers/rectangles.slice';
+import { fetchRectangles } from 'src/providers/reducers/rectangles.slice';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { increment } from 'src/providers/reducers/filters.reducer';
@@ -8,37 +8,22 @@ import { RootState } from 'src/providers/reducers';
 import List from 'src/components/List';
 import { useAppDispatch as useDispatch } from 'src/providers/store';
 import { unwrapResult } from '@reduxjs/toolkit';
-import gsap, { TweenLite } from 'gsap';
+import gsap from 'gsap';
 import Draggable from 'gsap/Draggable';
+import Rectangle from 'src/components/Rectangle';
 
 const Content = styled.div`
   width: 100%;
   overflow-y: auto;
 `;
 
-const Try = styled.div`
-  cursor: pointer;
-  text-decoration: underline;
-`;
-
 const Area = styled.div`
-  width: 800px;
+  width: 100%;
   height: 400px;
-  background-color: black;
+  background-color: #d8d8d8;
+  border-radius: 5px;
   position: relative;
-  margin-top: 10px;
-
-  .box {
-    background-color: #91e600;
-    text-align: center;
-    font-family: Asap, Avenir, Arial, sans-serif;
-    width: 196px;
-    height: 100px;
-    line-height: 100px;
-    color: black;
-    position: absolute;
-    border-radius: 10px;
-  }
+  margin: 0 0 20px 0;
 `;
 
 type Props = {
@@ -47,38 +32,44 @@ type Props = {
 
 gsap.registerPlugin(Draggable);
 
+const renderRectangles = (ref: HTMLDivElement): void => {
+  const draggables = Draggable.create('.box', {
+    bounds: ref,
+    type: 'x,y',
+  });
+  const area = draggables[0];
+
+  area.applyBounds(ref);
+};
+
 const Home: React.FC<Props> = () => {
   const dispatch = useDispatch();
-  const employees = useSelector((state: RootState) => state.employees);
+  const rectangles = useSelector((state: RootState) => state.rectangles);
   const refContainer = useRef(null);
 
   useEffect(() => {
-    dispatch(asyncFetchRectangles(123));
+    dispatch(fetchRectangles(123));
   }, []);
 
-  const handleAsyncFetchEmployee = (): void => {
-    dispatch(asyncFetchRectangles(123))
+  const handleDrag = (): void => {
+    dispatch(fetchRectangles(123))
       .then(unwrapResult)
       .then(res => console.log(res));
   };
 
   useEffect(() => {
-    const draggables = Draggable.create('.box', {
-      bounds: refContainer.current,
-      type: 'x,y',
-    });
-    const area = draggables[0];
-
-    area.applyBounds(refContainer.current);
-  }, []);
+    if (rectangles.length) renderRectangles(refContainer.current);
+  }, [rectangles]);
 
   return (
     <ErrorBoundary>
       <Content>
         <Area ref={refContainer}>
-          <div className="box" />
+          {rectangles.map(item => (
+            <Rectangle key={item.id} options={item} onDrag={handleDrag} />
+          ))}
         </Area>
-        <List items={employees} />
+        <List items={rectangles} />
       </Content>
     </ErrorBoundary>
   );
