@@ -45,7 +45,13 @@ const rectanglesSlice = createSlice({
   reducers: {
     updateRectanglePositionInStore: (state, action): void => {
       const { id, x, y } = action.payload;
-      console.log(x, y);
+
+      const rectangle = state.find(item => item.id === id);
+
+      if (rectangle) {
+        rectangle.x = x;
+        rectangle.y = y;
+      }
     },
   },
   extraReducers: builder => {

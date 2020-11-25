@@ -1,11 +1,12 @@
 import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
-import db from './db';
+import db, { updateRectanglePosition } from './db';
 
 const app = express();
 
 app.use(morgan('combined'));
+app.use(express.json());
 
 const publicPath = path.resolve(process.cwd(), 'dist', 'web');
 
@@ -25,6 +26,9 @@ app.use('/api/rectangles', async (req, res) => {
 
 app.put('/api/rectangle', async (req, res) => {
   await simulateWaiting();
+
+  const { id, x, y } = req.body;
+  updateRectanglePosition(id, x, y);
 
   res.set('Content-Type', 'application/json');
   res.end();

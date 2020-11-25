@@ -5,8 +5,9 @@ import { Table, Thead, Th, Tbody, Td, Tr } from './Table';
 
 const StyledList = styled.div`
   padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1px solid #d8d8d8;
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
 `;
 
 type Props = {

@@ -9,7 +9,7 @@ type Rectangle = {
   backgroundColor: string;
 };
 
-export const updatePosition = (id: string, x: number, y: number): void => {
+export const updateRectanglePosition = (id: string, x: number, y: number): void => {
   const rectangle = db.find(item => item.id === id);
   rectangle.x = x;
   rectangle.y = y;

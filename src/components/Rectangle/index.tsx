@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { Rectangle as Options } from 'src/providers/reducers/rectangles.slice';
 
@@ -17,7 +17,21 @@ type Props = {
 };
 
 const Rectangle: React.FC<Props> = ({ options }) => {
-  return <StyledRectangle className="box" {...options} />;
+  const { x, y } = options;
+  const keepX = useRef(x);
+  const keepY = useRef(y);
+
+  return (
+    <StyledRectangle
+      className="box"
+      x={keepX.current}
+      y={keepY.current}
+      backgroundColor={options.backgroundColor}
+      width={options.width}
+      height={options.height}
+      id={options.id}
+    />
+  );
 };
 
 export default Rectangle;

@@ -15,7 +15,14 @@ export const Th = styled.th`
 
 export const Tbody = styled.tbody``;
 
-export const Tr = styled.tr``;
+export const Tr = styled.tr`
+  &:last-of-type {
+    td {
+      border-bottom: 0;
+      padding-bottom: 5px;
+    }
+  }
+`;
 
 export const Td = styled.td`
   padding: 10px;
