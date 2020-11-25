@@ -7,7 +7,7 @@ import { increment } from 'src/providers/reducers/filters.reducer';
 import { RootState } from 'src/providers/reducers';
 import List from 'src/components/List';
 import { useAppDispatch as useDispatch } from 'src/providers/store';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { throttle } from 'throttle-typescript';
 import gsap from 'gsap';
 import Draggable from 'gsap/Draggable';
 import Rectangle from 'src/components/Rectangle';
@@ -37,6 +37,17 @@ const Home: React.FC<Props> = () => {
   const rectangles = useSelector((state: RootState) => state.rectangles);
   const refContainer = useRef(null);
 
+  const updatePositionInStore = (e: PointerEvent): void => {
+    const target = e.target as HTMLDivElement;
+    const id = target.getAttribute('id');
+    const x = target.offsetLeft;
+    const y = target.offsetTop;
+
+    console.log(x, y);
+  };
+
+  const throttledUpdatePositionInStore = throttle(updatePositionInStore, 100);
+
   const updatePosition = (e: PointerEvent): void => {
     const target = e.target as HTMLDivElement;
     const id = target.getAttribute('id');
@@ -50,6 +61,7 @@ const Home: React.FC<Props> = () => {
     const [area] = Draggable.create('.box', {
       bounds: ref,
       type: 'x,y',
+      onDrag: (e: PointerEvent): void => throttledUpdatePositionInStore(e),
       onDragEnd: updatePosition,
     });
 
