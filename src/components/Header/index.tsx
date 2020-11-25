@@ -28,7 +28,7 @@ const Header: React.FC<Props> = () => {
     <StyledHeader>
       <Logo />
       <AboutLink exact={true} to={'/chunked-page/'}>
-        About
+        Information
       </AboutLink>
     </StyledHeader>
   );

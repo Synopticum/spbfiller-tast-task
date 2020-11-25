@@ -9,11 +9,6 @@ module.exports = {
           name: 'common',
           chunks: 'all',
         },
-        material: {
-          test: /\/node_modules\/@material-ui/,
-          name: 'material-ui',
-          chunks: 'all',
-        },
       },
     },
   },

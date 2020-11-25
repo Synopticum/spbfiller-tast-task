@@ -12,14 +12,7 @@ const StyledFooter = styled.footer`
 type Props = {};
 
 export const Footer: React.FC<Props> = () => {
-  return (
-    <StyledFooter>
-      Copyright © 2020
-      <a href="#" target="_blank" rel="noreferrer">
-        Test Solutions LTD.
-      </a>
-    </StyledFooter>
-  );
+  return <StyledFooter>by Sergey Novikov © 2020</StyledFooter>;
 };
 
 export default Footer;

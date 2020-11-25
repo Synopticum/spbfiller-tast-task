@@ -31,21 +31,7 @@ module.exports = api => {
       '@babel/plugin-transform-react-constant-elements',
       '@babel/plugin-transform-react-inline-elements',
       'date-fns',
-      web
-        ? [
-            'babel-plugin-transform-imports',
-            {
-              '@material-ui/core': {
-                transform: '@material-ui/core/esm/${member}',
-                preventFullImport: true,
-              },
-              '@material-ui/icons': {
-                transform: '@material-ui/icons/esm/${member}',
-                preventFullImport: true,
-              },
-            },
-          ]
-        : null,
+      web ? ['babel-plugin-transform-imports'] : null,
     ].filter(Boolean),
   };
 };

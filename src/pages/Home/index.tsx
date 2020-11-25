@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ErrorBoundary from 'src/components/ErrorBoundary';
 import {
   fetchRectangles,
@@ -7,7 +7,6 @@ import {
 } from 'src/providers/reducers/rectangles.slice';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
-import { increment } from 'src/providers/reducers/filters.reducer';
 import { RootState } from 'src/providers/reducers';
 import List from 'src/components/List';
 import { useAppDispatch as useDispatch } from 'src/providers/store';
@@ -15,13 +14,14 @@ import { throttle } from 'throttle-typescript';
 import gsap from 'gsap';
 import Draggable from 'gsap/Draggable';
 import Rectangle from 'src/components/Rectangle';
+import { getCurrentPosition } from 'src/pages/Home/helpers';
 
 const Content = styled.div`
   width: 100%;
   overflow-y: auto;
 `;
 
-const Area = styled.div`
+const DragArea = styled.div`
   width: 100%;
   height: 400px;
   background-color: #d8d8d8;
@@ -29,76 +29,58 @@ const Area = styled.div`
   position: relative;
 `;
 
-type Props = {
-  increment: typeof increment;
-};
-
 gsap.registerPlugin(Draggable);
 
-const getCurrentPosition = (e: PointerEvent): { id: string; x: number; y: number } => {
-  try {
-    const target = e.target as HTMLDivElement;
-    const { x: parentX, y: parentY } = target.parentElement.getBoundingClientRect();
-    const { x: targetX, y: targetY } = target.getBoundingClientRect();
-    const id = target.getAttribute('id');
-    const x = Math.round(targetX) - Math.round(parentX);
-    const y = Math.round(targetY) - Math.round(parentY);
-
-    return { id, x, y };
-  } catch (e) {
-    return undefined;
-  }
-};
+type Props = {};
 
 const Home: React.FC<Props> = () => {
   const dispatch = useDispatch();
   const rectangles = useSelector((state: RootState) => state.rectangles);
-  const refContainer = useRef(null);
-  const [renderedOnce, setRenderedOnce] = useState(false);
+  const dragArea = useRef(null);
+  const [gsapInitialized, setGsapInitialized] = useState(false);
 
-  const updatePositionInStore = throttle((e: PointerEvent): void => {
-    const position = getCurrentPosition(e);
-    if (position) dispatch(updateRectanglePositionInStore(position));
-  }, 100);
-
-  const updatePositionOnServer = (e: PointerEvent): void => {
+  const updatePositionOnServer = useCallback((e: PointerEvent): void => {
     const position = getCurrentPosition(e);
 
     if (position) {
       dispatch(updateRectanglePositionInStore(position));
       dispatch(updateRectanglePositionOnServer(position));
     }
-  };
+  }, []);
 
-  const renderRectangles = (ref: HTMLDivElement): void => {
+  const updatePositionInStore = useCallback((e: PointerEvent): void => {
+    throttle((e: PointerEvent): void => {
+      const position = getCurrentPosition(e);
+      if (position) dispatch(updateRectanglePositionInStore(position));
+    }, 100)(e);
+  }, []);
+
+  const renderRectangles = useCallback((ref: HTMLDivElement): void => {
     const [area] = Draggable.create('.box', {
       bounds: ref,
       type: 'x,y',
-      onDrag: (e: PointerEvent): void => updatePositionInStore(e),
+      onDrag: updatePositionInStore,
       onDragEnd: updatePositionOnServer,
     });
 
     area.applyBounds(ref);
-  };
+    setGsapInitialized(true);
+  }, []);
 
   useEffect(() => void dispatch(fetchRectangles()), []);
 
   useEffect(() => {
-    if (rectangles.length && !renderedOnce) {
-      console.log('rendered');
-      renderRectangles(refContainer.current);
-      setRenderedOnce(true);
-    }
+    if (!gsapInitialized && rectangles.length) renderRectangles(dragArea.current);
   }, [rectangles]);
 
   return (
     <ErrorBoundary>
       <Content>
-        <Area ref={refContainer}>
+        <DragArea ref={dragArea}>
           {rectangles.map(item => (
-            <Rectangle key={item.id} options={item} />
+            <Rectangle key={item.id} model={item} />
           ))}
-        </Area>
+        </DragArea>
         <List items={rectangles} />
       </Content>
     </ErrorBoundary>

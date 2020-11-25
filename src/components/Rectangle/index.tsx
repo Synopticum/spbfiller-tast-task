@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import { Rectangle as Options } from 'src/providers/reducers/rectangles.slice';
+import { Rectangle as Model } from 'src/providers/reducers/rectangles.slice';
 
-const StyledRectangle = styled.div<Options>`
+const StyledRectangle = styled.div<Model & { initialX: number; initialY: number }>`
   position: absolute;
-  left: ${({ x }): string => `${x}px`};
-  top: ${({ y }): string => `${y}px`};
+  left: ${({ initialX }): string => `${initialX}px`};
+  top: ${({ initialY }): string => `${initialY}px`};
   background-color: ${({ backgroundColor }): string => backgroundColor};
   width: ${({ width }): string => `${width}px`};
   height: ${({ height }): string => `${height}px`};
@@ -13,25 +13,15 @@ const StyledRectangle = styled.div<Options>`
 `;
 
 type Props = {
-  options: Options;
+  model: Model;
 };
 
-const Rectangle: React.FC<Props> = ({ options }) => {
-  const { x, y } = options;
-  const keepX = useRef(x);
-  const keepY = useRef(y);
+const Rectangle: React.FC<Props> = ({ model }) => {
+  const { x, y } = model;
+  const initialX = useRef(x).current;
+  const initialY = useRef(y).current;
 
-  return (
-    <StyledRectangle
-      className="box"
-      x={keepX.current}
-      y={keepY.current}
-      backgroundColor={options.backgroundColor}
-      width={options.width}
-      height={options.height}
-      id={options.id}
-    />
-  );
+  return <StyledRectangle className="box" {...model} initialX={initialX} initialY={initialY} />;
 };
 
 export default Rectangle;
